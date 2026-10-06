@@ -1,0 +1,11 @@
+Flask
+Flask-CORS
+Flask-Mail
+python-dotenv
+mysql-connector-python
+pandas
+numpy
+scikit-learn
+joblib
+reportlab
+gunicorn
