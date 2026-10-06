@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application History</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .history-container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        h1 {
+            color: #1d4ed8;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            min-width: 900px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        .approved {
+            color: green;
+            font-weight: bold;
+        }
+
+        .rejected {
+            color: red;
+            font-weight: bold;
+        }
+
+        .pending {
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        .download-btn {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .download-btn:hover {
+            background: #15803d;
+        }
+
+        .back {
+            width: 200px;
+            margin-bottom: 10px;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="history-container">
+
+    <h1>Loan Application History</h1>
+
+    <button class="back"
+            onclick="location.href='dashboard.html'">
+        Back to Dashboard
+    </button>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Loan Amount</th>
+                <th>Prediction</th>
+                <th>Probability</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Report</th>
+            </tr>
+        </thead>
+
+        <tbody id="historyTable">
+            <tr>
+                <td colspan="7">
+                    Loading applications...
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+
+    <p id="message"></p>
+
+</div>
+
+
+<script>
+
+async function loadHistory() {
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:5000/api/my-applications",
+            {
+                method: "GET",
+                credentials: "include"
+            }
+        );
+
+        const result = await response.json();
+
+        console.log("Applications:", result);
+
+        if (!result.success) {
+
+            document.getElementById("message").innerText =
+                result.message || "Unable to load applications";
+
+            return;
+        }
+
+        const table =
+            document.getElementById("historyTable");
+
+        const applications =
+            result.applications || [];
+
+        if (applications.length === 0) {
+
+            table.innerHTML =
+                "<tr><td colspan='7'>No applications found</td></tr>";
+
+            return;
+        }
+
+        table.innerHTML = "";
+
+        applications.forEach(app => {
+
+            let predictionClass = "";
+
+            if (app.prediction === "Approved") {
+                predictionClass = "approved";
+            }
+            else if (app.prediction === "Rejected") {
+                predictionClass = "rejected";
+            }
+
+            let statusClass = "";
+
+            if (app.status === "Approved") {
+                statusClass = "approved";
+            }
+            else if (app.status === "Rejected") {
+                statusClass = "rejected";
+            }
+            else {
+                statusClass = "pending";
+            }
+
+            table.innerHTML += `
+                <tr>
+
+                    <td>
+                        ${app.id}
+                    </td>
+
+                    <td>
+                        ₹${Number(app.loan_amount).toFixed(2)}
+                    </td>
+
+                    <td class="${predictionClass}">
+                        ${app.prediction}
+                    </td>
+
+                    <td>
+                        ${Number(app.probability).toFixed(2)}%
+                    </td>
+
+                    <td class="${statusClass}">
+                        ${app.status}
+                    </td>
+
+                    <td>
+                        ${new Date(
+                            app.created_at
+                        ).toLocaleString()}
+                    </td>
+
+                    <td>
+
+                        <button
+                            class="download-btn"
+                            onclick="downloadReport(${app.id})">
+                            📄 Download
+                        </button>
+
+                    </td>
+
+                </tr>
+            `;
+        });
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        document.getElementById("message").innerText =
+            "Unable to connect to server";
+    }
+}
+
+
+async function downloadReport(applicationId) {
+
+    try {
+
+        const response = await fetch(
+            `http://127.0.0.1:5000/api/my-applications/${applicationId}/pdf`,
+            {
+                method: "GET",
+                credentials: "include"
+            }
+        );
+
+        if (!response.ok) {
+
+            const result = await response.json();
+
+            alert(
+                result.message ||
+                "Unable to download report"
+            );
+
+            return;
+        }
+
+        const blob = await response.blob();
+
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+
+        link.href = url;
+
+        link.download =
+            `loan_application_${applicationId}.pdf`;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+        window.URL.revokeObjectURL(url);
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        alert("Unable to download PDF");
+    }
+}
+
+
+loadHistory();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Profile - Loan Approval</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .password-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .profile-btn {
+            margin-top: 20px;
+        }
+
+        .cancel-btn {
+            background: #777;
+            margin-top: 10px;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>My Profile</h1>
+
+    <!-- PROFILE DETAILS -->
+    <div id="profile">
+        <p>Loading profile...</p>
+    </div>
+
+    <!-- CHANGE PASSWORD BUTTON -->
+    <button
+        class="profile-btn"
+        onclick="showPasswordForm()">
+        Change Password
+    </button>
+
+    <hr>
+
+    <!-- CHANGE PASSWORD FORM -->
+    <div id="passwordSection" class="password-section">
+
+        <h2>Change Password</h2>
+
+        <input
+            id="currentPassword"
+            type="password"
+            placeholder="Current Password">
+
+        <input
+            id="newPassword"
+            type="password"
+            placeholder="New Password">
+
+        <button onclick="changePassword()">
+            Change Password
+        </button>
+
+        <button
+            class="cancel-btn"
+            onclick="hidePasswordForm()">
+            Cancel
+        </button>
+
+        <p id="message"></p>
+
+    </div>
+
+    <br>
+
+    <a href="dashboard.html">Back to Dashboard</a>
+
+</div>
+
+
+<script>
+
+async function loadProfile() {
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:5000/api/profile",
+            {
+                credentials: "include"
+            }
+        );
+
+        const result = await response.json();
+
+        if (!result.success) {
+
+            window.location.href = "login.html";
+            return;
+
+        }
+
+        const user = result.user;
+
+        document.getElementById("profile").innerHTML = `
+
+            <p>
+                <strong>Name:</strong>
+                ${user.name}
+            </p>
+
+            <p>
+                <strong>Email:</strong>
+                ${user.email}
+            </p>
+
+            <p>
+                <strong>Phone:</strong>
+                ${user.phone || "Not provided"}
+            </p>
+
+            <p>
+                <strong>Role:</strong>
+                ${user.role}
+            </p>
+
+            <p>
+                <strong>Account Created:</strong>
+                ${new Date(user.created_at).toLocaleString()}
+            </p>
+
+        `;
+
+    }
+
+    catch (error) {
+
+        document.getElementById("profile").innerText =
+            "Unable to load profile.";
+
+    }
+
+}
+
+
+// SHOW PASSWORD FORM
+
+function showPasswordForm() {
+
+    document.getElementById("passwordSection").style.display =
+        "block";
+
+}
+
+
+// HIDE PASSWORD FORM
+
+function hidePasswordForm() {
+
+    document.getElementById("passwordSection").style.display =
+        "none";
+
+    document.getElementById("currentPassword").value = "";
+    document.getElementById("newPassword").value = "";
+
+    document.getElementById("message").innerText = "";
+
+}
+
+
+// CHANGE PASSWORD
+
+async function changePassword() {
+
+    const currentPassword =
+        document.getElementById("currentPassword").value;
+
+    const newPassword =
+        document.getElementById("newPassword").value;
+
+
+    if (!currentPassword || !newPassword) {
+
+        document.getElementById("message").innerText =
+            "Please enter both passwords.";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:5000/api/change-password",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                credentials: "include",
+
+                body: JSON.stringify({
+                    current_password: currentPassword,
+                    new_password: newPassword
+                })
+            }
+        );
+
+
+        const result = await response.json();
+
+
+        document.getElementById("message").innerText =
+            result.message;
+
+
+        if (result.success) {
+
+            document.getElementById("currentPassword").value = "";
+            document.getElementById("newPassword").value = "";
+
+        }
+
+    }
+
+    catch (error) {
+
+        document.getElementById("message").innerText =
+            "Something went wrong.";
+
+    }
+
+}
+
+
+loadProfile();
+
+</script>
+
+</body>
+</html>

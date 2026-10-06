@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Apply Loan</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+
+        .error {
+            color: #dc2626;
+            font-size: 13px;
+            margin: -8px 0 10px;
+            display: none;
+        }
+
+        input.invalid,
+        select.invalid {
+            border: 2px solid #dc2626;
+        }
+
+        .success-result {
+            color: green;
+        }
+
+        .error-result {
+            color: #dc2626;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Loan Application</h1>
+
+
+    <!-- GENDER -->
+
+    <select id="Gender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+    </select>
+
+
+    <!-- MARRIED -->
+
+    <select id="Married">
+        <option value="Yes">Married</option>
+        <option value="No">Not Married</option>
+    </select>
+
+
+    <!-- DEPENDENTS -->
+
+    <input
+        id="Dependents"
+        placeholder="Dependents"
+        type="text"
+    >
+
+    <p class="error" id="DependentsError"></p>
+
+
+    <!-- EDUCATION -->
+
+    <select id="Education">
+
+        <option value="Graduate">
+            Graduate
+        </option>
+
+        <option value="Not Graduate">
+            Not Graduate
+        </option>
+
+    </select>
+
+
+    <!-- SELF EMPLOYED -->
+
+    <select id="Self_Employed">
+
+        <option value="No">
+            Not Self Employed
+        </option>
+
+        <option value="Yes">
+            Self Employed
+        </option>
+
+    </select>
+
+
+    <!-- APPLICANT INCOME -->
+
+    <input
+        id="ApplicantIncome"
+        type="number"
+        min="1"
+        step="0.01"
+        placeholder="Applicant Income"
+    >
+
+    <p class="error" id="ApplicantIncomeError"></p>
+
+
+    <!-- CO-APPLICANT INCOME -->
+
+    <input
+        id="CoapplicantIncome"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="Coapplicant Income"
+    >
+
+    <p class="error" id="CoapplicantIncomeError"></p>
+
+
+    <!-- LOAN AMOUNT -->
+
+    <input
+        id="LoanAmount"
+        type="number"
+        min="1"
+        step="0.01"
+        placeholder="Loan Amount"
+    >
+
+    <p class="error" id="LoanAmountError"></p>
+
+
+    <!-- LOAN TERM -->
+
+    <input
+        id="Loan_Amount_Term"
+        type="number"
+        min="12"
+        max="480"
+        step="12"
+        value="360"
+        placeholder="Loan Term"
+    >
+
+    <p class="error" id="LoanTermError"></p>
+
+
+    <!-- CREDIT HISTORY -->
+
+    <select id="Credit_History">
+
+        <option value="1">
+            Good Credit History
+        </option>
+
+        <option value="0">
+            Poor Credit History
+        </option>
+
+    </select>
+
+
+    <!-- PROPERTY AREA -->
+
+    <select id="Property_Area">
+
+        <option value="Urban">
+            Urban
+        </option>
+
+        <option value="Semiurban">
+            Semiurban
+        </option>
+
+        <option value="Rural">
+            Rural
+        </option>
+
+    </select>
+
+
+    <button
+        id="predictButton"
+        onclick="predict()"
+    >
+        Predict Loan Approval
+    </button>
+
+
+    <p id="result"></p>
+
+</div>
+
+
+<script>
+
+
+// =========================================================
+// VALIDATION HELPER
+// =========================================================
+
+function showError(
+    inputId,
+    errorId,
+    message
+) {
+
+    const input =
+        document.getElementById(inputId);
+
+    const error =
+        document.getElementById(errorId);
+
+    input.classList.add("invalid");
+
+    error.innerText = message;
+
+    error.style.display = "block";
+}
+
+
+function clearError(
+    inputId,
+    errorId
+) {
+
+    const input =
+        document.getElementById(inputId);
+
+    const error =
+        document.getElementById(errorId);
+
+    input.classList.remove("invalid");
+
+    error.innerText = "";
+
+    error.style.display = "none";
+}
+
+
+// =========================================================
+// FORM VALIDATION
+// =========================================================
+
+function validateForm() {
+
+    let valid = true;
+
+
+    // -----------------------------------------------------
+    // DEPENDENTS
+    // -----------------------------------------------------
+
+    const dependents =
+        document
+            .getElementById("Dependents")
+            .value
+            .trim();
+
+
+    clearError(
+        "Dependents",
+        "DependentsError"
+    );
+
+
+    if (dependents === "") {
+
+        showError(
+            "Dependents",
+            "DependentsError",
+            "Please enter number of dependents."
+        );
+
+        valid = false;
+
+    }
+    else if (
+        !/^[0-9]+$/.test(dependents)
+        &&
+        dependents !== "3+"
+    ) {
+
+        showError(
+            "Dependents",
+            "DependentsError",
+            "Enter a valid value such as 0, 1, 2 or 3+."
+        );
+
+        valid = false;
+    }
+
+
+    // -----------------------------------------------------
+    // APPLICANT INCOME
+    // -----------------------------------------------------
+
+    const applicantIncome =
+        Number(
+            document
+                .getElementById("ApplicantIncome")
+                .value
+        );
+
+
+    clearError(
+        "ApplicantIncome",
+        "ApplicantIncomeError"
+    );
+
+
+    if (
+        !Number.isFinite(applicantIncome)
+        ||
+        applicantIncome <= 0
+    ) {
+
+        showError(
+            "ApplicantIncome",
+            "ApplicantIncomeError",
+            "Applicant income must be greater than 0."
+        );
+
+        valid = false;
+    }
+
+
+    // -----------------------------------------------------
+    // CO-APPLICANT INCOME
+    // -----------------------------------------------------
+
+    const coapplicantIncome =
+        Number(
+            document
+                .getElementById("CoapplicantIncome")
+                .value
+        );
+
+
+    clearError(
+        "CoapplicantIncome",
+        "CoapplicantIncomeError"
+    );
+
+
+    if (
+        !Number.isFinite(coapplicantIncome)
+        ||
+        coapplicantIncome < 0
+    ) {
+
+        showError(
+            "CoapplicantIncome",
+            "CoapplicantIncomeError",
+            "Co-applicant income cannot be negative."
+        );
+
+        valid = false;
+    }
+
+
+    // -----------------------------------------------------
+    // LOAN AMOUNT
+    // -----------------------------------------------------
+
+    const loanAmount =
+        Number(
+            document
+                .getElementById("LoanAmount")
+                .value
+        );
+
+
+    clearError(
+        "LoanAmount",
+        "LoanAmountError"
+    );
+
+
+    if (
+        !Number.isFinite(loanAmount)
+        ||
+        loanAmount <= 0
+    ) {
+
+        showError(
+            "LoanAmount",
+            "LoanAmountError",
+            "Loan amount must be greater than 0."
+        );
+
+        valid = false;
+    }
+
+
+    // -----------------------------------------------------
+    // LOAN TERM
+    // -----------------------------------------------------
+
+    const loanTerm =
+        Number(
+            document
+                .getElementById("Loan_Amount_Term")
+                .value
+        );
+
+
+    clearError(
+        "Loan_Amount_Term",
+        "LoanTermError"
+    );
+
+
+    if (
+        !Number.isFinite(loanTerm)
+        ||
+        loanTerm < 12
+        ||
+        loanTerm > 480
+    ) {
+
+        showError(
+            "Loan_Amount_Term",
+            "LoanTermError",
+            "Loan term must be between 12 and 480 months."
+        );
+
+        valid = false;
+    }
+
+
+    return valid;
+}
+
+
+// =========================================================
+// PREDICT
+// =========================================================
+
+async function predict() {
+
+    const resultBox =
+        document.getElementById("result");
+
+    const button =
+        document.getElementById("predictButton");
+
+
+    // -----------------------------------------------------
+    // VALIDATE BEFORE API REQUEST
+    // -----------------------------------------------------
+
+    if (!validateForm()) {
+
+        resultBox.className =
+            "error-result";
+
+        resultBox.innerText =
+            "Please correct the highlighted fields.";
+
+        return;
+    }
+
+
+    // -----------------------------------------------------
+    // PREPARE DATA
+    // -----------------------------------------------------
+
+    const data = {
+
+        Gender:
+            document.getElementById("Gender").value,
+
+        Married:
+            document.getElementById("Married").value,
+
+        Dependents:
+            document.getElementById("Dependents").value,
+
+        Education:
+            document.getElementById("Education").value,
+
+        Self_Employed:
+            document.getElementById("Self_Employed").value,
+
+        ApplicantIncome:
+            document.getElementById("ApplicantIncome").value,
+
+        CoapplicantIncome:
+            document.getElementById("CoapplicantIncome").value,
+
+        LoanAmount:
+            document.getElementById("LoanAmount").value,
+
+        Loan_Amount_Term:
+            document.getElementById("Loan_Amount_Term").value,
+
+        Credit_History:
+            document.getElementById("Credit_History").value,
+
+        Property_Area:
+            document.getElementById("Property_Area").value
+
+    };
+
+
+    // -----------------------------------------------------
+    // LOADING STATE
+    // -----------------------------------------------------
+
+    button.disabled = true;
+
+    button.innerText =
+        "Processing...";
+
+    button.classList.add("loading");
+
+
+    resultBox.className = "";
+
+    resultBox.innerText =
+        "Analyzing your application...";
+
+
+    try {
+
+        // -------------------------------------------------
+        // API REQUEST
+        // -------------------------------------------------
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:5000/api/predict",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    credentials: "include",
+
+                    body:
+                        JSON.stringify(data)
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        // -------------------------------------------------
+        // SUCCESS
+        // -------------------------------------------------
+
+        if (
+            response.ok
+            &&
+            result.success
+        ) {
+
+            resultBox.className =
+                "success-result";
+
+
+            resultBox.innerHTML =
+
+                "<h2>Prediction: "
+                +
+                result.prediction
+                +
+                "</h2>"
+
+                +
+
+                "<p>Probability: "
+                +
+                Number(
+                    result.probability
+                ).toFixed(2)
+                +
+                "%</p>"
+
+                +
+
+                "<p>Model: "
+                +
+                result.model
+                +
+                "</p>"
+
+                +
+
+                "<p>Application ID: "
+                +
+                result.application_id
+                +
+                "</p>";
+
+        }
+
+
+        // -------------------------------------------------
+        // API ERROR
+        // -------------------------------------------------
+
+        else {
+
+            resultBox.className =
+                "error-result";
+
+            resultBox.innerText =
+                result.message
+                ||
+                result.error
+                ||
+                "Prediction failed.";
+
+        }
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Prediction error:",
+            error
+        );
+
+
+        resultBox.className =
+            "error-result";
+
+
+        resultBox.innerText =
+            "Unable to connect to the server. Please try again.";
+
+    }
+
+
+    finally {
+
+        button.disabled = false;
+
+        button.innerText =
+            "Predict Loan Approval";
+
+        button.classList.remove(
+            "loading"
+        );
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>

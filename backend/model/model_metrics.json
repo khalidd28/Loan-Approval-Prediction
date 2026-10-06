@@ -1,0 +1,23 @@
+{
+    "best_model": "Decision Tree",
+    "models": {
+        "Logistic Regression": {
+            "accuracy": 70.0,
+            "precision": 100.0,
+            "recall": 62.5,
+            "f1_score": 76.92
+        },
+        "Decision Tree": {
+            "accuracy": 100.0,
+            "precision": 100.0,
+            "recall": 100.0,
+            "f1_score": 100.0
+        },
+        "Random Forest": {
+            "accuracy": 90.0,
+            "precision": 100.0,
+            "recall": 87.5,
+            "f1_score": 93.33
+        }
+    }
+}

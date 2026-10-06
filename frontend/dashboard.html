@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loan Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Loan Approval System</h1>
+
+    <h2>Welcome, <span id="username"></span> 👋</h2>
+
+    <p>Apply for a loan and get an ML-based prediction.</p>
+
+    <button onclick="location.href='apply-loan.html'">
+        Apply for Loan
+    </button>
+
+    <button onclick="location.href='history.html'">
+        Application History
+    </button>
+    <button onclick="window.location.href='profile.html'">
+    My Profile
+</button>
+
+    <button onclick="logout()">
+        Logout
+    </button>
+    
+</div>
+
+<script>
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+if (!user) {
+    window.location.href = "login.html";
+}
+
+document.getElementById("username").innerText = user.name;
+
+async function logout() {
+
+    await fetch("http://127.0.0.1:5000/api/logout", {
+        method: "POST",
+        credentials: "include"
+    });
+
+    localStorage.removeItem("user");
+
+    window.location.href = "login.html";
+}
+
+</script>
+
+</body>
+</html>

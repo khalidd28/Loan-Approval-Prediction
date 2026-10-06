@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loan Approval - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Loan Approval System</h1>
+    <h2>Login</h2>
+
+    <input id="email" type="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <p id="message"></p>
+
+    <p>Don't have an account?
+        <a href="register.html">Register</a>
+    </p>
+</div>
+
+<script>
+async function login() {
+
+    const data = {
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value
+    };
+
+    const response = await fetch("http://127.0.0.1:5000/api/login", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    credentials: "include",
+    body: JSON.stringify(data)
+});
+    const result = await response.json();
+
+    document.getElementById("message").innerText = result.message;
+
+    if (result.success) {
+
+        localStorage.setItem("user", JSON.stringify(result.user));
+
+        if (result.user.role === "admin") {
+            window.location.href = "admin.html";
+        } else {
+            window.location.href = "dashboard.html";
+        }
+    }
+}
+</script>
+
+</body>
+</html>
