@@ -5,7 +5,7 @@ python-dotenv
 mysql-connector-python
 pandas
 numpy
-scikit-learn
+scikit-learn==1.7.2
 joblib
 reportlab
 gunicorn
