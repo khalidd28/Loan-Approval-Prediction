@@ -1245,7 +1245,7 @@ async function loadUsers() {
 
         const response =
             await fetch(
-                "http://127.0.0.1:5000/api/admin/users",
+                "https://loan-approval-api-881e.onrender.com/api/admin/users",
                 {
                     method: "GET",
                     credentials: "include"
@@ -1377,7 +1377,7 @@ async function loadDashboard() {
 
         const response =
             await fetch(
-                "http://127.0.0.1:5000/api/admin/dashboard",
+                "https://loan-approval-api-881e.onrender.com/api/admin/dashboard",
                 {
                     method: "GET",
                     credentials: "include"
@@ -1483,7 +1483,7 @@ async function loadCharts() {
 
         const modelResponse =
             await fetch(
-                "http://127.0.0.1:5000/api/admin/model-metrics",
+                "https://loan-approval-api-881e.onrender.com/api/admin/model-metrics",
                 {
                     method: "GET",
                     credentials: "include"
@@ -1590,7 +1590,7 @@ async function loadCharts() {
 
         const dashboardResponse =
             await fetch(
-                "http://127.0.0.1:5000/api/admin/dashboard",
+                "https://loan-approval-api-881e.onrender.com/api/admin/dashboard",
                 {
                     method: "GET",
                     credentials: "include"
@@ -1697,7 +1697,7 @@ async function loadNotifications() {
     try {
 
         const response = await fetch(
-            "http://127.0.0.1:5000/api/admin/notifications",
+            "https://loan-approval-api-881e.onrender.com/api/admin/notifications",
             {
                 method: "GET",
                 credentials: "include"
@@ -1818,7 +1818,7 @@ async function updateApplicationStatus(
     try {
 
         const response = await fetch(
-            `http://127.0.0.1:5000/api/admin/application/${applicationId}/status`,
+            `https://loan-approval-api-881e.onrender.com/api/admin/application/${applicationId}/status`,
             {
                 method: "PATCH",
 
@@ -1873,7 +1873,7 @@ async function loadAdvancedAnalytics() {
     try {
 
         const response = await fetch(
-            "http://127.0.0.1:5000/api/admin/analytics",
+            "https://loan-approval-api-881e.onrender.com/api/admin/analytics",
             {
                 method: "GET",
                 credentials: "include"
@@ -2101,7 +2101,7 @@ async function logout() {
     try {
 
         await fetch(
-            "http://127.0.0.1:5000/api/logout",
+            "https://loan-approval-api-881e.onrender.com/api/logout",
             {
                 method: "POST",
                 credentials: "include"
@@ -2174,7 +2174,7 @@ loadAdvancedAnalytics();
 function downloadCSV() {
 
     window.open(
-        "http://127.0.0.1:5000/api/admin/export/csv",
+        "https://loan-approval-api-881e.onrender.com/api/admin/export/csv",
         "_blank"
     );
 }
@@ -2183,7 +2183,7 @@ function downloadCSV() {
 function downloadPDF() {
 
     window.open(
-        "http://127.0.0.1:5000/api/admin/export/pdf",
+        "https://loan-approval-api-881e.onrender.com/api/admin/export/pdf",
         "_blank"
     );
 }

@@ -43,7 +43,7 @@ document.getElementById("username").innerText = user.name;
 
 async function logout() {
 
-    await fetch("http://127.0.0.1:5000/api/logout", {
+    await fetch("https://loan-approval-api-881e.onrender.com/api/logout", {
         method: "POST",
         credentials: "include"
     });
