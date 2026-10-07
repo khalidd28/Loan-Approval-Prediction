@@ -27,8 +27,7 @@ DATASET_PATH = os.path.join(
     "loan_data.csv"
 )
 
-MODEL_DIR = BASE_DIR
-
+MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # -----------------------------
 # Load Dataset
@@ -245,6 +244,30 @@ for name, model in models.items():
 # Save Best Model
 # -----------------------------
 
+def fix_imputer(obj):
+
+    if hasattr(obj, "steps"):
+        for _, step in obj.steps:
+            fix_imputer(step)
+
+    if hasattr(obj, "transformers_"):
+        for _, transformer, _ in obj.transformers_:
+            fix_imputer(transformer)
+
+    if isinstance(obj, SimpleImputer):
+
+        if not hasattr(obj, "_fill_dtype"):
+            obj._fill_dtype = obj.statistics_.dtype
+
+        if not hasattr(obj, "_fit_dtype"):
+            obj._fit_dtype = obj.statistics_.dtype
+
+
+# Fix compatibility
+fix_imputer(best_model)
+fix_imputer(imputer)
+
+
 joblib.dump(
     best_model,
     os.path.join(
@@ -276,8 +299,6 @@ joblib.dump(
         "imputer.pkl"
     )
 )
-
-
 # -----------------------------
 # Save Model Comparison
 # -----------------------------
