@@ -112,12 +112,23 @@ CORS(
                 "https://warm-lokum-36b19b.netlify.app",
                 "http://127.0.0.1:5500",
                 "http://localhost:5500"
-            ]
+            ],
+            "methods": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS"
+            ],
+            "allow_headers": [
+                "Content-Type",
+                "Authorization"
+            ],
+            "supports_credentials": True
         }
-    },
-    supports_credentials=True
+    }
 )
-
 # ============================================================
 # REGISTER BLUEPRINTS
 # ============================================================
@@ -125,6 +136,9 @@ CORS(
 app.register_blueprint(auth_bp)
 app.register_blueprint(loan_bp)
 app.register_blueprint(admin_bp)
+@app.route("/api/<path:path>", methods=["OPTIONS"])
+def handle_options(path):
+    return "", 204
 
 
 # ============================================================
