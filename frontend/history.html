@@ -128,7 +128,7 @@ async function loadHistory() {
     try {
 
         const response = await fetch(
-            "https://loan-approval-api-881e.onrender.com/api/my-applications",
+            "/api/my-applications",
             {
                 method: "GET",
                 credentials: "include"
@@ -245,7 +245,7 @@ async function downloadReport(applicationId) {
     try {
 
         const response = await fetch(
-            `https://loan-approval-api-881e.onrender.com/api/my-applications/${applicationId}/pdf`,
+            `/api/my-applications/${applicationId}/pdf`,
             {
                 method: "GET",
                 credentials: "include"

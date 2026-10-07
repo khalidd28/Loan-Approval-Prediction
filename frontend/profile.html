@@ -89,7 +89,7 @@ async function loadProfile() {
     try {
 
         const response = await fetch(
-            "https://loan-approval-api-881e.onrender.com/api/profile",
+            "/api/profile",
             {
                 credentials: "include"
             }
@@ -196,7 +196,7 @@ async function changePassword() {
     try {
 
         const response = await fetch(
-            "https://loan-approval-api-881e.onrender.com/api/change-password",
+            "/api/change-password",
             {
                 method: "POST",
 
