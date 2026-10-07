@@ -1325,7 +1325,9 @@ def update_application_status(application_id):
             SELECT
                 la.id,
                 la.status,
+                la.loan_amount,
                 la.prediction,
+
                 u.name AS applicant_name,
                 u.email AS applicant_email
 
@@ -1371,84 +1373,48 @@ def update_application_status(application_id):
         connection.commit()
 
         # -------------------------------------------------
-        # SEND EMAIL
-        #
-        # Only send when changing TO Approved/Rejected.
-        # This prevents emails for Pending.
-        #
-        # Also prevents duplicate emails when selecting
-        # the same status again.
+        # SEND STATUS EMAIL
         # -------------------------------------------------
 
         email_sent = False
 
-        if (
-            new_status in [
-                "Approved",
-                "Rejected"
-            ]
-            and old_status != new_status
-        ):
+        try:
 
             email_sent = send_status_email(
-
-                applicant_email=
-                    application["applicant_email"],
-
-                applicant_name=
-                    application["applicant_name"],
-
-                application_id=
-                    application_id,
-
-                status=
-                    new_status,
-
-                prediction=
-                    application["prediction"]
+                application["applicant_email"],
+                application["applicant_name"],
+                new_status,
+                application["loan_amount"],
+                application["prediction"]
             )
+
+        except Exception as email_error:
+
+            print(
+                "STATUS EMAIL ERROR:",
+                email_error
+            )
+
+            email_sent = False
 
         # -------------------------------------------------
         # RESPONSE
         # -------------------------------------------------
-
-        if email_sent:
-
-            message = (
-                "Application status updated successfully "
-                "and email notification sent to applicant."
-            )
-
-        elif (
-            new_status in [
-                "Approved",
-                "Rejected"
-            ]
-            and old_status != new_status
-        ):
-
-            message = (
-                "Application status updated successfully, "
-                "but email notification could not be sent."
-            )
-
-        else:
-
-            message = (
-                "Application status updated successfully."
-            )
 
         return jsonify({
 
             "success": True,
 
             "message":
-                message,
+                "Application status updated successfully",
 
             "application_id":
                 application_id,
 
-            "status":
+            "old_status":
+                old_status,
+
+            "new_status":
                 new_status,
 
             "email_sent":
@@ -1460,14 +1426,17 @@ def update_application_status(application_id):
 
         if connection:
 
-            connection.rollback()
+            try:
+                connection.rollback()
+            except Exception:
+                pass
 
         return jsonify({
 
             "success": False,
 
             "message":
-                f"Failed to update status: {str(e)}"
+                f"Failed to update application status: {str(e)}"
 
         }), 500
 

@@ -92,7 +92,7 @@ app.config["MAIL_DEFAULT_SENDER"] = os.getenv(
         ""
     )
 )
-
+app.config["MAIL_TIMEOUT"] = 10
 
 # ============================================================
 # INITIALIZE MAIL
